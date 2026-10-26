@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>¡Feliz Cumpleaños, Daphne! 🎂</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link id="googleFontsLink" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&family=Outfit:wght@300;400;600;700&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Fondo de Partículas Dinámicas -->
+    <canvas id="particlesCanvas"></canvas>
+
+    <!-- Botón flotante para alternar Modo Edición -->
+    <button id="btnToggleEditMode" class="floating-edit-btn" title="Activar / Desactivar Editor">✏️ Editor</button>
+
+    <button id="btnPreview" class="preview-btn btn secondary-btn">👁 Ver como Daphne</button>
+    <button id="btnBackToEditor" class="preview-btn btn secondary-btn hidden">← Volver al editor</button>
+
+    <!-- Contenedor Principal -->
+    <main class="main-container">
+        
+        <!-- Navegación Superior -->
+        <nav class="app-nav" id="appNav">
+            <!-- Dinámico generado por JS -->
+        </nav>
+
+        <!-- Contenedor de Pantallas Dinámicas -->
+        <div id="screensContainer">
+            <!-- Las pantallas se inyectan aquí dinámicamente -->
+        </div>
+
+        <!-- Controles de Navegación Rápida (Anterior / Siguiente) -->
+        <div class="screen-controls" id="screenControls">
+            <button class="btn secondary-btn" id="btnPrevScreen">← Anterior</button>
+            <button class="btn primary-btn" id="btnNextScreen">Siguiente →</button>
+        </div>
+
+    </main>
+
+    <!-- Panel de Edición Visual -->
+    <aside id="editorPanel" class="editor-panel hidden">
+        <div class="editor-header-panel">
+            <h2>⚙️ Panel de Edición</h2>
+            <button id="btnCloseEditor" class="close-btn">✕</button>
+        </div>
+        
+        <div class="editor-tabs">
+            <button class="tab-btn active" data-tab="generalTab">General & Estilos</button>
+            <button class="tab-btn" data-tab="screensTab">Pantallas</button>
+            <button class="tab-btn" data-tab="dataTab">Guardar / Exportar</button>
+        </div>
+
+        <!-- Tab 1: General & Estilos -->
+        <div class="tab-content active" id="generalTab">
+            <div class="input-group">
+                <label>Tipografía principal:</label>
+                <select id="selectFont">
+                    <option value="'Plus Jakarta Sans', sans-serif">Plus Jakarta Sans</option>
+                    <option value="'Outfit', sans-serif">Outfit</option>
+                    <option value="'Quicksand', sans-serif">Quicksand</option>
+                </select>
+            </div>
+            <div class="color-pickers-grid">
+                <div class="input-group">
+                    <label>Color Primario:</label>
+                    <input type="color" id="colorPrimary" value="#ff6b8b">
+                </div>
+                <div class="input-group">
+                    <label>Color Secundario:</label>
+                    <input type="color" id="colorSecondary" value="#8a4fff">
+                </div>
+                <div class="input-group">
+                    <label>Color Fondo 1:</label>
+                    <input type="color" id="colorBg1" value="#0f0c20">
+                </div>
+                <div class="input-group">
+                    <label>Color Fondo 2:</label>
+                    <input type="color" id="colorBg2" value="#2a0845">
+                </div>
+            </div>
+            <div class="input-group">
+                <label>Tamaño de fuente global:</label>
+                <input type="range" id="rangeFontSize" min="14" max="20" value="16">
+            </div>
+            <div class="input-group">
+                <label>Animaciones (Partículas y efectos):</label>
+                <select id="selectAnimationPreset">
+                    <option value="normal">Normal (Globos y Destellos)</option>
+                    <option value="subtle">Sutil (Menos densidad)</option>
+                    <option value="off">Desactivadas</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tab 2: Gestión de Pantallas -->
+        <div class="tab-content" id="screensTab">
+            <div class="editor-actions-top">
+                <button class="btn primary-btn" id="btnAddScreen">+ Añadir apartado</button>
+            </div>
+            <div id="screensListEditor" class="screens-list-editor">
+                <!-- Listado de pantallas para ordenar/editar/ocultar/eliminar -->
+            </div>
+        </div>
+
+        <!-- Tab 3: Datos, Backup y Compartir -->
+        <div class="tab-content" id="dataTab">
+            <div class="data-section-box">
+                <h3>💾 Almacenamiento Local</h3>
+                <p>Tus cambios se guardan en este navegador. Para que Daphne los vea, descarga la versión limpia y súbela a GitHub como index.html.</p>
+                <button class="btn secondary-btn" id="btnResetDefault">Restaurar valores iniciales</button>
+            </div>
+            <div class="data-section-box">
+                <h3>📤 Copia de seguridad</h3>
+                <p>Exporta o importa tus ajustes en un archivo JSON.</p>
+                <div class="btn-group-row">
+                    <button class="btn secondary-btn" id="btnExportJSON">Exportar JSON</button>
+                    <label class="btn secondary-btn file-upload-label">
+                        Importar JSON <input type="file" id="inputImportJSON" accept=".json" hidden>
+                    </label>
+                </div>
+            </div>
+            <div class="data-section-box highlight-box">
+                <h3>🎁 Versión para Daphne</h3>
+                <p>Descarga un archivo listo con todo tu contenido personalizado y <strong>sin controles de edición</strong> para enviárselo.</p>
+                <button class="btn primary-btn" id="btnExportShareable">Descargar index.html para Daphne</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Modal para Añadir / Editar Apartado -->
+    <div id="screenModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <h3 id="modalTitle">Añadir Nuevo Apartado</h3>
+            <div class="input-group">
+                <label>Nombre del apartado (Menú):</label>
+                <input type="text" id="modalScreenName" placeholder="Ej. Mis deseos para ti">
+            </div>
+            <div class="input-group" id="modalTemplateGroup">
+                <label>Selecciona una Plantilla:</label>
+                <select id="modalScreenTemplate">
+                    <option value="inicio">Inicio / Bienvenida (Cumpleaños)</option>
+                    <option value="cartas">Mi carta</option>
+                    <option value="recuerdos">Tarjetas de Recuerdos</option>
+                    <option value="fotos">Galería de Fotos</option>
+                    <option value="mensajes">Cosas que amamos de ti</option>
+                    <option value="sorpresas">Sorpresas interactivas</option>
+                    <option value="final">Foto final con desvanecimiento</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn secondary-btn" id="modalCancel">Cancelar</button>
+                <button class="btn primary-btn" id="modalSave">Guardar Apartado</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Editar Contenido de Pantalla Individual -->
+    <div id="contentModal" class="modal-overlay hidden">
+        <div class="modal-card wide-modal">
+            <h3>✏️ Editar Contenido del Apartado</h3>
+            <div id="contentModalBody" class="content-modal-body">
+                <!-- Se inyectan campos específicos según la plantilla -->
+            </div>
+            <div class="modal-actions">
+                <button class="btn secondary-btn" id="contentModalCancel">Cancelar</button>
+                <button class="btn primary-btn" id="contentModalSave">Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
